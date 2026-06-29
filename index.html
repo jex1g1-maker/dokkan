@@ -9,12 +9,12 @@
     <!-- Font Awesome للأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SDK الخاص بجوجل فايبربيز (Firebase) للربط السحابي المباشر -->
+    <!-- SDK الخاص بجوجل فايبربيز (Firebase) للربط السحابي وقاعدة البيانات ومخزن الصور -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
     <style>
-        /* الألوان المستوحاة من الشعار النحاسي والبرونزي الفاخر */
         :root {
             --primary-bronze: #8C6A50;
             --dark-copper: #5A3E2B;
@@ -59,7 +59,6 @@
                     <i class="fa-solid fa-store"></i> <span data-key="navStore">المتجر</span>
                 </button>
                 
-                <!-- زر لوحة التحكم مخفي تماماً ولن يظهر للعميل العادي أبداً -->
                 <button id="navAdmin" onclick="switchView('admin')" class="hidden bg-bronze text-white hover:bg-dark-copper px-4 py-2 rounded-lg text-sm font-medium shadow flex items-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-user-gear"></i> <span data-key="navAdmin">لوحة التحكم</span>
                 </button>
@@ -89,9 +88,7 @@
         </div>
 
         <h2 class="text-2xl font-bold mb-6 text-gray-700 border-r-4 border-bronze pr-3" data-key="productsTitle">أحدث المنتجات</h2>
-        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- المنتجات تظهر هنا تلقائياً من السحابة -->
-        </div>
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </main>
 
     <!-- واجهة لوحة التحكم (Admin Panel) المخفية -->
@@ -99,7 +96,7 @@
         <div class="border-b border-gray-200 pb-4 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800" data-key="adminPanelTitle">لوحة تحكم الإدارة</h1>
-                <p class="text-gray-500 text-sm mt-1" data-key="adminPanelSub">أضف منتجات بلا حدود، حدّد الأسعار، وتابع طلباتك في مكان واحد</p>
+                <p class="text-gray-500 text-sm mt-1" data-key="adminPanelSub">أضف منتجات بلا حدود، عدّل الأسعار، وتابع طلباتك في مكان واحد</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="showAdminTab('products')" id="tabBtnProducts" class="bg-bronze text-white px-4 py-2 rounded-lg font-medium shadow cursor-pointer">
@@ -119,6 +116,7 @@
                 </h3>
                 <form id="productForm" onsubmit="handleProductSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <input type="hidden" id="editProductId">
+                    <input type="hidden" id="editProductImageUrl"> <!-- لتخزين رابط الصورة القديمة في حال التعديل -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-key="lblProdNameAr">اسم المنتج (بالعربية)</label>
                         <input type="text" id="prodNameAr" required class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-bronze outline-none">
@@ -141,12 +139,12 @@
                         </select>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1" data-key="lblProdImage">رابط صورة المنتج</label>
-                        <input type="url" id="prodImage" placeholder="https://images.unsplash.com/..." required class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-bronze outline-none text-left" dir="ltr">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">صورة المنتج (تحميل من جهازك)</label>
+                        <input type="file" id="prodImage" accept="image/*" class="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-bronze outline-none bg-white text-left" dir="ltr">
                     </div>
                     <div class="flex items-end md:col-span-3">
                         <button type="submit" id="saveProdBtn" class="w-full bg-bronze hover:bg-dark-copper text-white py-2.5 px-4 rounded-lg font-bold shadow transition cursor-pointer">
-                            <i class="fa-solid fa-floppy-disk"></i> <span data-key="btnSaveProduct">حفظ المنتج في السحابة</span>
+                            <i class="fa-solid fa-cloud-arrow-up"></i> <span id="btnSaveText">حفظ المنتج ورفع الصورة</span>
                         </button>
                     </div>
                 </form>
@@ -208,7 +206,6 @@
                     <input type="text" id="custAddress" required class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-bronze">
                 </div>
                 
-                <!-- تم إلغاء فوري نهائياً وتثبيت الدفع عند الاستلام -->
                 <div class="bg-green-50 border border-green-200 p-3 rounded-lg text-sm text-green-900 flex items-center gap-2">
                     <i class="fa-solid fa-truck-ramp-box text-lg"></i>
                     <span><strong>طريقة الدفع:</strong> الدفع عند الاستلام نقداً (COD) عند الفحص والمراجعة.</span>
@@ -241,9 +238,8 @@
         </div>
     </footer>
 
-    <!-- منطق البرمجة والربط السحابي الحقيقي للبيانات -->
+    <!-- البرمجة والربط السحابي مع Firebase ومخزن الصور -->
     <script>
-        // 🚀 تم دمج بيانات حساب Firebase الخاص بك هنا بنجاح
         const firebaseConfig = {
             apiKey: "AIzaSyBfeQeiopwk_DLXtwUZeAVIWky3f7sjWE8",
             authDomain: "dokkan-c4208.firebaseapp.com",
@@ -256,6 +252,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const storage = firebase.storage(); // تفعيل مخزن الصور السحابي
 
         const ADMIN_PASSWORD = "dokkan2026";
 
@@ -268,17 +265,15 @@
                 manageProducts: "إدارة المنتجات", viewOrders: "الطلبات الواردة",
                 addNewProduct: "إضافة منتج جديد", lblProdNameAr: "اسم المنتج (بالعربية)",
                 lblProdNameEn: "اسم المنتج (بالإنجليزية)", lblProdPrice: "السعر (EGP)",
-                lblProdImage: "رابط صورة المنتج", btnSaveProduct: "حفظ المنتج في السحابة",
                 tblImage: "الصورة", tblName: "الاسم", tblPrice: "السعر", tblActions: "الخيارات",
                 cartTitle: "سلة المشتريات", totalAmount: "إجمالي المطلوب:",
                 shippingDetails: "تفاصيل الشحن والتوصيل", lblCustName: "اسم العميل بالكامل",
                 lblCustPhone: "رقم الهاتف", lblCustAddress: "العنوان بالتفصيل",
                 btnConfirmOrder: "تأكيد وإرسال الطلب", footerDesc: "تطبيق ويب تجاري متكامل مبني لتقديم أفضل تجربة بيع وشراء حرة بلا قيود.",
                 footerContactTitle: "قنوات التواصل معنا", addToCart: "إضافة للسلة",
-                edit: "تعديل", delete: "حذف", orderId: "رقم الطلب", customer: "العميل",
-                phone: "الهاتف", address: "العنوان", items: "المنتجات", total: "الإجمالي",
+                orderId: "رقم الطلب", customer: "العميل", phone: "الهاتف", address: "العنوان", items: "المنتجات", total: "الإجمالي",
                 status: "حالة الطلب", pending: "قيد المراجعة", completed: "تم التوصيل",
-                category: "الفئة", clothes: "ملابس", electronics: "إلكترونيات", accessories: "إكسسوارات", other: "أخرى"
+                clothes: "ملابس", electronics: "إلكترونيات", accessories: "إكسسوارات", other: "أخرى"
             },
             en: {
                 navStore: "Store", navAdmin: "Admin Panel", heroTitle: "Welcome to Dokkan",
@@ -288,17 +283,15 @@
                 manageProducts: "Manage Products", viewOrders: "Incoming Orders",
                 addNewProduct: "Add New Product", lblProdNameAr: "Product Name (Arabic)",
                 lblProdNameEn: "Product Name (English)", lblProdPrice: "Price (EGP)",
-                lblProdImage: "Product Image URL", btnSaveProduct: "Save Product to Cloud",
                 tblImage: "Image", tblName: "Name", tblPrice: "Price", tblActions: "Actions",
                 cartTitle: "Shopping Cart", totalAmount: "Total Amount:",
                 shippingDetails: "Shipping & Delivery Details", lblCustName: "Full Customer Name",
                 lblCustPhone: "Phone Number", lblCustAddress: "Full Address",
                 btnConfirmOrder: "Confirm & Place Order", footerDesc: "A comprehensive e-commerce web application built for seamless control.",
                 footerContactTitle: "Contact Channels", addToCart: "Add to Cart",
-                edit: "Edit", delete: "Delete", orderId: "Order ID", customer: "Customer",
-                phone: "Phone", address: "Address", items: "Items", total: "Total",
+                orderId: "Order ID", customer: "Customer", phone: "Phone", address: "Address", items: "Items", total: "Total",
                 status: "Status", pending: "Pending", completed: "Delivered",
-                category: "Category", clothes: "Clothes", electronics: "Electronics", accessories: "Accessories", other: "Other"
+                clothes: "Clothes", electronics: "Electronics", accessories: "Accessories", other: "Other"
             }
         };
 
@@ -386,7 +379,6 @@
             }
         }
 
-        // دالة الفرز واختيار فئة المنتجات
         function filterCategory(cat) {
             activeCategory = cat;
             const buttons = document.querySelectorAll('#categoryTabs button');
@@ -400,8 +392,6 @@
         function renderStoreProducts() {
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
-            
-            // فلترة المنتجات بناءً على الفئة المختارة
             const filtered = activeCategory === 'all' ? products : products.filter(p => p.category === activeCategory);
 
             if(filtered.length === 0) {
@@ -493,21 +483,17 @@
             renderCartItems();
         }
 
-        // 🤖 إرسال الإشعار الآلي الصامت إلى الواتساب الخاص بك بالخلفية
         function sendSilentWhatsAppAlert(order) {
             const itemsSummary = order.items.map(i => `${i.product.nameAr} (${i.qty} قطع)`).join(' + ');
             const message = `🛍️ طلب جديد في دُكّان!\n-------------------\n👤 العميل: ${order.customerName}\n📞 الهاتف: ${order.phone}\n📍 العنوان: ${order.address}\n📦 الطلبات: ${itemsSummary}\n💰 الإجمالي: ${order.total} EGP\n💵 طريقة الدفع: عند الاستلام`;
             
-            // 💡 لتفعيلها مجاناً وتلقائياً بالكامل: سجل رقمك في خدمة CallMeBot السهلة وضع الـ ApiKey هنا
             const myCallMeBotApiKey = "ضع_هنا_API_KEY_الخاص_بخدمة_callmebot"; 
             
             if(myCallMeBotApiKey && myCallMeBotApiKey !== "ضع_هنا_API_KEY_الخاص_بخدمة_callmebot") {
                 const targetUrl = `https://api.callmebot.com/whatsapp.php?phone=201039721545&text=${encodeURIComponent(message)}&apikey=${myCallMeBotApiKey}`;
                 fetch(targetUrl)
-                    .then(() => console.log("تم إرسال إشعار الواتساب الآلي خلف الكواليس!"))
+                    .then(() => console.log("تم إرسال إشعار الواتساب الآلي!"))
                     .catch(err => console.error("فشل إرسال رسالة الواتساب:", err));
-            } else {
-                console.log("الإشعار الآلي جاهز، لكن يحتاج لمفتاح الـ Api Key للعمل صامتاً:", message);
             }
         }
 
@@ -526,11 +512,8 @@
                 date: new Date().toLocaleString()
             };
 
-            // حفظ الطلب سحابياً في الفايربيز
             database.ref('orders').push(orderData).then(() => {
-                // استدعاء ميزة إرسال رسالة الواتساب الآلية صامتاً
                 sendSilentWhatsAppAlert(orderData);
-
                 cart = [];
                 updateCartCount();
                 document.getElementById('checkoutForm').reset();
@@ -561,35 +544,80 @@
             });
         }
 
+        // 🚀 معالجة ورفع المنتج مع الصورة من الجهاز مباشرة
         function handleProductSubmit(e) {
             e.preventDefault();
+            const btn = document.getElementById('saveProdBtn');
+            const btnText = document.getElementById('btnSaveText');
+            
+            // قفل الزرار وعرض حالة التحميل لحين انتهاء الرفع السحابي
+            btn.disabled = true;
+            btnText.innerText = "...جاري رفع الصورة والبيانات للسحابة";
+
             const id = document.getElementById('editProductId').value;
             const nameAr = document.getElementById('prodNameAr').value;
             const nameEn = document.getElementById('prodNameEn').value;
             const price = parseFloat(document.getElementById('prodPrice').value);
             const category = document.getElementById('prodCategory').value;
-            const image = document.getElementById('prodImage').value;
+            const fileInput = document.getElementById('prodImage');
+            const file = fileInput.files[0];
+            let existingImageUrl = document.getElementById('editProductImageUrl').value;
 
-            const productData = { nameAr, nameEn, price, category, image };
-
-            if(id) {
-                database.ref('products/' + id).set(productData);
-            } else {
-                database.ref('products').push(productData);
+            // التحقق من وجود صورة للمنتج الجديد
+            if (!file && !id) {
+                alert('الرجاء اختيار صورة للمنتج من جهازك أولاً!');
+                resetSaveButton();
+                return;
             }
 
+            if (file) {
+                // رفع الصورة لـ Firebase Storage
+                const storageRef = storage.ref('products/' + Date.now() + '_' + file.name);
+                storageRef.put(file).then(snapshot => {
+                    return snapshot.ref.getDownloadURL();
+                }).then(downloadURL => {
+                    saveToDatabase(id, { nameAr, nameEn, price, category, image: downloadURL });
+                }).catch(err => {
+                    alert('حدث خطأ أثناء رفع الملف السحابي: ' + err.message);
+                    resetSaveButton();
+                });
+            } else {
+                // تعديل بدون تغيير الصورة القديمة
+                saveToDatabase(id, { nameAr, nameEn, price, category, image: existingImageUrl });
+            }
+        }
+
+        function saveToDatabase(id, productData) {
+            if(id) {
+                database.ref('products/' + id).set(productData).then(() => finalizeProductSubmit());
+            } else {
+                database.ref('products').push(productData).then(() => finalizeProductSubmit());
+            }
+        }
+
+        function finalizeProductSubmit() {
             document.getElementById('productForm').reset();
             document.getElementById('editProductId').value = '';
+            document.getElementById('editProductImageUrl').value = '';
+            resetSaveButton();
+            alert('تم حفظ المنتج وتحديث السحابة بنجاح!');
+        }
+
+        function resetSaveButton() {
+            const btn = document.getElementById('saveProdBtn');
+            const btnText = document.getElementById('btnSaveText');
+            btn.disabled = false;
+            btnText.innerText = "حفظ المنتج ورفع الصورة";
         }
 
         function editProduct(id) {
             const p = products.find(prod => prod.id === id);
             document.getElementById('editProductId').value = p.id;
+            document.getElementById('editProductImageUrl').value = p.image; // الاحتفاظ بالصورة القديمة
             document.getElementById('prodNameAr').value = p.nameAr;
             document.getElementById('prodNameEn').value = p.nameEn;
             document.getElementById('prodPrice').value = p.price;
             document.getElementById('prodCategory').value = p.category || 'other';
-            document.getElementById('prodImage').value = p.image;
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
