@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dokkan | دُكّان</title>
+    <!-- Tailwind CSS للتصميم العصري -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Font Awesome للأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- SDK الخاص بجوجل فايبربيز (Firebase) للربط السحابي المباشر -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -36,9 +39,10 @@
         }
         .shake-effect { animation: shake 0.4s ease-in-out; }
     </style>
-</head<meta name="google-site-verification" content="6GlFnuzdZF1yhDDTLZMdU8WcJgxlC2rEMg15QCoSyds" />>
+</head>
 <body class="text-gray-800 transition-all duration-300">
 
+    <!-- شريط التنقل العلوي -->
     <nav class="bg-white shadow-md sticky top-0 z-50 border-b-2 border-bronze">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-4 space-x-reverse">
@@ -55,6 +59,7 @@
                     <i class="fa-solid fa-store"></i> <span data-key="navStore">المتجر</span>
                 </button>
                 
+                <!-- زر لوحة التحكم مخفي تماماً ولن يظهر للعميل العادي أبداً -->
                 <button id="navAdmin" onclick="switchView('admin')" class="hidden bg-bronze text-white hover:bg-dark-copper px-4 py-2 rounded-lg text-sm font-medium shadow flex items-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-user-gear"></i> <span data-key="navAdmin">لوحة التحكم</span>
                 </button>
@@ -67,22 +72,34 @@
         </div>
     </nav>
 
+    <!-- واجهة المتجر الرئيسية للعملاء -->
     <main id="storeView" class="container mx-auto px-4 py-8">
         <div class="bg-gradient-to-r from-[#8C6A50] to-[#5A3E2B] text-white rounded-2xl p-8 mb-8 shadow-xl relative overflow-hidden text-center md:text-right">
             <h1 class="text-3xl md:text-5xl font-extrabold mb-2" data-key="heroTitle">مرحباً بك في دُكّان</h1>
             <p class="text-lg text-amber-100" data-key="heroSub">تجربة تسوق فريدة، سهلة وسريعة مثل أكبر المتاجر العالمية</p>
         </div>
 
+        <!-- أزرار فرز وتصنيف المنتجات -->
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none" id="categoryTabs">
+            <button onclick="filterCategory('all')" id="cat-all" class="bg-bronze text-white px-4 py-1.5 rounded-full text-sm font-semibold transition shadow cursor-pointer">الكل / All</button>
+            <button onclick="filterCategory('clothes')" id="cat-clothes" class="bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-1.5 rounded-full text-sm font-semibold transition cursor-pointer">ملابس</button>
+            <button onclick="filterCategory('electronics')" id="cat-electronics" class="bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-1.5 rounded-full text-sm font-semibold transition cursor-pointer">إلكترونيات</button>
+            <button onclick="filterCategory('accessories')" id="cat-accessories" class="bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-1.5 rounded-full text-sm font-semibold transition cursor-pointer">إكسسوارات</button>
+            <button onclick="filterCategory('other')" id="cat-other" class="bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-1.5 rounded-full text-sm font-semibold transition cursor-pointer">أخرى</button>
+        </div>
+
         <h2 class="text-2xl font-bold mb-6 text-gray-700 border-r-4 border-bronze pr-3" data-key="productsTitle">أحدث المنتجات</h2>
         <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            </div>
+            <!-- المنتجات تظهر هنا تلقائياً من السحابة -->
+        </div>
     </main>
 
+    <!-- واجهة لوحة التحكم (Admin Panel) المخفية -->
     <main id="adminView" class="container mx-auto px-4 py-8 hidden">
         <div class="border-b border-gray-200 pb-4 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800" data-key="adminPanelTitle">لوحة تحكم الإدارة</h1>
-                <p class="text-gray-500 text-sm mt-1" data-key="adminPanelSub">أضف منتجات بلا حدود، عدّل الأسعار، وتابع طلباتك في مكان واحد</p>
+                <p class="text-gray-500 text-sm mt-1" data-key="adminPanelSub">أضف منتجات بلا حدود، حدّد الأسعار، وتابع طلباتك في مكان واحد</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="showAdminTab('products')" id="tabBtnProducts" class="bg-bronze text-white px-4 py-2 rounded-lg font-medium shadow cursor-pointer">
@@ -94,6 +111,7 @@
             </div>
         </div>
 
+        <!-- تبويب إدارة المنتجات -->
         <div id="adminProductsTab">
             <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 mb-8">
                 <h3 class="text-xl font-bold mb-4 text-dark-copper flex items-center gap-2">
@@ -113,13 +131,22 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-key="lblProdPrice">السعر (EGP)</label>
                         <input type="number" id="prodPrice" required class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-bronze outline-none">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تصنيف المنتج (الفئة)</label>
+                        <select id="prodCategory" class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-bronze outline-none bg-white">
+                            <option value="clothes">ملابس</option>
+                            <option value="electronics">إلكترونيات</option>
+                            <option value="accessories">إكسسوارات</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1" data-key="lblProdImage">رابط صورة المنتج (روابط من الإنترنت)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-key="lblProdImage">رابط صورة المنتج</label>
                         <input type="url" id="prodImage" placeholder="https://images.unsplash.com/..." required class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-bronze outline-none text-left" dir="ltr">
                     </div>
-                    <div class="flex items-end">
+                    <div class="flex items-end md:col-span-3">
                         <button type="submit" id="saveProdBtn" class="w-full bg-bronze hover:bg-dark-copper text-white py-2.5 px-4 rounded-lg font-bold shadow transition cursor-pointer">
-                            <i class="fa-solid fa-floppy-disk"></i> <span data-key="btnSaveProduct">حفظ المنتج</span>
+                            <i class="fa-solid fa-floppy-disk"></i> <span data-key="btnSaveProduct">حفظ المنتج في السحابة</span>
                         </button>
                     </div>
                 </form>
@@ -131,22 +158,23 @@
                         <tr class="bg-gray-50 text-gray-600 text-sm uppercase">
                             <th class="p-4" data-key="tblImage">الصورة</th>
                             <th class="p-4" data-key="tblName">الاسم</th>
+                            <th class="p-4">الفئة</th>
                             <th class="p-4" data-key="tblPrice">السعر</th>
                             <th class="p-4 text-center" data-key="tblActions">الخيارات</th>
                         </tr>
                     </thead>
-                    <tbody id="adminProductsTableBody">
-                        </tbody>
+                    <tbody id="adminProductsTableBody"></tbody>
                 </table>
             </div>
         </div>
 
+        <!-- تبويب الطلبات السحابية الواردة -->
         <div id="adminOrdersTab" class="hidden">
-            <div id="ordersList" class="space-y-4">
-                </div>
+            <div id="ordersList" class="space-y-4"></div>
         </div>
     </main>
 
+    <!-- مودال سلة المشتريات والدفع عند الاستلام فقط -->
     <div id="cartModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl relative">
             <button onclick="closeCartModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 text-xl cursor-pointer">
@@ -179,16 +207,11 @@
                     <label class="block text-xs font-semibold text-gray-600 mb-1" data-key="lblCustAddress">العنوان بالتفصيل</label>
                     <input type="text" id="custAddress" required class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-bronze">
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1" data-key="lblPayMethod">طريقة الدفع</label>
-                    <select id="payMethod" onchange="toggleWalletInfo()" class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-bronze bg-white">
-                        <option value="cod" data-key="optCod">الدفع عند الاستلام (COD)</option>
-                        <option value="wallet" data-key="optWallet">الدفع الفوري عبر المحفظة الإلكترونية</option>
-                    </select>
-                </div>
-                <div id="walletInfoBox" class="hidden bg-amber-50 border border-amber-200 p-3 rounded-lg text-sm text-amber-900">
-                    <i class="fa-solid fa-wallet"></i> <span data-key="walletMsg">برجاء تحويل المبلغ إلى رقم محفظتنا التالي وإرفاق الاسم عند التأكيد:</span>
-                    <strong class="block text-center text-lg text-bronze my-1">01039721545</strong>
+                
+                <!-- تم إلغاء فوري نهائياً وتثبيت الدفع عند الاستلام -->
+                <div class="bg-green-50 border border-green-200 p-3 rounded-lg text-sm text-green-900 flex items-center gap-2">
+                    <i class="fa-solid fa-truck-ramp-box text-lg"></i>
+                    <span><strong>طريقة الدفع:</strong> الدفع عند الاستلام نقداً (COD) عند الفحص والمراجعة.</span>
                 </div>
 
                 <button type="submit" class="w-full bg-bronze hover:bg-dark-copper text-white py-3 rounded-xl font-bold shadow-lg transition-transform transform hover:scale-[1.02] cursor-pointer">
@@ -198,6 +221,7 @@
         </div>
     </div>
 
+    <!-- تذييل الصفحة -->
     <footer class="bg-gray-900 text-gray-400 mt-20 border-t-4 border-bronze py-8">
         <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-right">
             <div>
@@ -209,7 +233,6 @@
                 <ul class="space-y-2 text-sm">
                     <li><i class="fa-solid fa-envelope text-bronze"></i> dokkan.1g1@gmail.com</li>
                     <li><i class="fa-brands fa-whatsapp text-green-500"></i> 01039721545</li>
-                    <li><i class="fa-solid fa-money-bill-wave text-amber-500"></i> رقم المحفظة: 01039721545</li>
                 </ul>
             </div>
             <div class="flex flex-col justify-center items-center md:items-end">
@@ -218,23 +241,22 @@
         </div>
     </footer>
 
+    <!-- منطق البرمجة والربط السحابي الحقيقي للبيانات -->
     <script>
-        // ⚠️ ضع هنا بيانات مشروع Firebase الخاص بك لكي يعمل الموقع فوراً على الإنترنت
+        // 🚀 تم دمج بيانات حساب Firebase الخاص بك هنا بنجاح
         const firebaseConfig = {
             apiKey: "AIzaSyBfeQeiopwk_DLXtwUZeAVIWky3f7sjWE8",
             authDomain: "dokkan-c4208.firebaseapp.com",
+            databaseURL: "https://dokkan-c4208-default-rtdb.firebaseio.com",
             projectId: "dokkan-c4208",
             storageBucket: "dokkan-c4208.firebasestorage.app",
             messagingSenderId: "688108297069",
             appId: "1:688108297069:web:3f65769e34d456749e1864"
         };
-        
 
-        // بدء تشغيل Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // كلمة المرور السرية الخاصة بك لفتح لوحة التحكم
         const ADMIN_PASSWORD = "dokkan2026";
 
         const translations = {
@@ -246,19 +268,17 @@
                 manageProducts: "إدارة المنتجات", viewOrders: "الطلبات الواردة",
                 addNewProduct: "إضافة منتج جديد", lblProdNameAr: "اسم المنتج (بالعربية)",
                 lblProdNameEn: "اسم المنتج (بالإنجليزية)", lblProdPrice: "السعر (EGP)",
-                lblProdImage: "رابط صورة المنتج", btnSaveProduct: "حفظ المنتج",
+                lblProdImage: "رابط صورة المنتج", btnSaveProduct: "حفظ المنتج في السحابة",
                 tblImage: "الصورة", tblName: "الاسم", tblPrice: "السعر", tblActions: "الخيارات",
                 cartTitle: "سلة المشتريات", totalAmount: "إجمالي المطلوب:",
                 shippingDetails: "تفاصيل الشحن والتوصيل", lblCustName: "اسم العميل بالكامل",
                 lblCustPhone: "رقم الهاتف", lblCustAddress: "العنوان بالتفصيل",
-                lblPayMethod: "طريقة الدفع", optCod: "الدفع عند الاستلام (COD)",
-                optWallet: "الدفع الفوري عبر المحفظة الإلكترونية",
-                walletMsg: "برجاء تحويل المبلغ إلى رقم محفظتنا التالي وإرفاق الاسم عند التأكيد:",
                 btnConfirmOrder: "تأكيد وإرسال الطلب", footerDesc: "تطبيق ويب تجاري متكامل مبني لتقديم أفضل تجربة بيع وشراء حرة بلا قيود.",
                 footerContactTitle: "قنوات التواصل معنا", addToCart: "إضافة للسلة",
                 edit: "تعديل", delete: "حذف", orderId: "رقم الطلب", customer: "العميل",
                 phone: "الهاتف", address: "العنوان", items: "المنتجات", total: "الإجمالي",
-                payment: "الدفع", status: "حالة الطلب", pending: "قيد المراجعة", completed: "تم التوصيل"
+                status: "حالة الطلب", pending: "قيد المراجعة", completed: "تم التوصيل",
+                category: "الفئة", clothes: "ملابس", electronics: "إلكترونيات", accessories: "إكسسوارات", other: "أخرى"
             },
             en: {
                 navStore: "Store", navAdmin: "Admin Panel", heroTitle: "Welcome to Dokkan",
@@ -268,19 +288,17 @@
                 manageProducts: "Manage Products", viewOrders: "Incoming Orders",
                 addNewProduct: "Add New Product", lblProdNameAr: "Product Name (Arabic)",
                 lblProdNameEn: "Product Name (English)", lblProdPrice: "Price (EGP)",
-                lblProdImage: "Product Image URL", btnSaveProduct: "Save Product",
+                lblProdImage: "Product Image URL", btnSaveProduct: "Save Product to Cloud",
                 tblImage: "Image", tblName: "Name", tblPrice: "Price", tblActions: "Actions",
                 cartTitle: "Shopping Cart", totalAmount: "Total Amount:",
                 shippingDetails: "Shipping & Delivery Details", lblCustName: "Full Customer Name",
                 lblCustPhone: "Phone Number", lblCustAddress: "Full Address",
-                lblPayMethod: "Payment Method", optCod: "Cash on Delivery (COD)",
-                optWallet: "Instant Mobile Wallet Payment",
-                walletMsg: "Please transfer the total amount to our wallet number below:",
                 btnConfirmOrder: "Confirm & Place Order", footerDesc: "A comprehensive e-commerce web application built for seamless control.",
                 footerContactTitle: "Contact Channels", addToCart: "Add to Cart",
                 edit: "Edit", delete: "Delete", orderId: "Order ID", customer: "Customer",
                 phone: "Phone", address: "Address", items: "Items", total: "Total",
-                payment: "Payment", status: "Status", pending: "Pending", completed: "Delivered"
+                status: "Status", pending: "Pending", completed: "Delivered",
+                category: "Category", clothes: "Clothes", electronics: "Electronics", accessories: "Accessories", other: "Other"
             }
         };
 
@@ -288,27 +306,16 @@
         let products = [];
         let cart = [];
         let orders = [];
+        let activeCategory = 'all';
 
         function initApp() {
-            // 🔄 الاستماع الفوري للمنتجات من قاعدة البيانات السحابية
             database.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data) {
-                    products = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                } else {
-                    // إذا كانت قاعدة البيانات فارغة تماماً، نرفع منتجات افتراضية مبدئياً
-                    const defaultProducts = {
-                        "prod_1": { nameAr: "ساعة ذكية فاخرة", nameEn: "Premium Smart Watch", price: 1250, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500" },
-                        "prod_2": { nameAr: "سماعات عازلة للصوت", nameEn: "Noise Cancelling Headphones", price: 2400, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" }
-                    };
-                    database.ref('products').set(defaultProducts);
-                    return;
-                }
+                products = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
                 renderStoreProducts();
                 renderAdminProducts();
             });
 
-            // 🔄 الاستماع الفوري للطلبات الواردة من السحابة
             database.ref('orders').on('value', (snapshot) => {
                 const data = snapshot.val();
                 orders = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
@@ -379,10 +386,30 @@
             }
         }
 
+        // دالة الفرز واختيار فئة المنتجات
+        function filterCategory(cat) {
+            activeCategory = cat;
+            const buttons = document.querySelectorAll('#categoryTabs button');
+            buttons.forEach(btn => {
+                btn.className = "bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-1.5 rounded-full text-sm font-semibold transition cursor-pointer";
+            });
+            document.getElementById('cat-' + cat).className = "bg-bronze text-white px-4 py-1.5 rounded-full text-sm font-semibold transition shadow cursor-pointer";
+            renderStoreProducts();
+        }
+
         function renderStoreProducts() {
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
-            products.forEach(p => {
+            
+            // فلترة المنتجات بناءً على الفئة المختارة
+            const filtered = activeCategory === 'all' ? products : products.filter(p => p.category === activeCategory);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-12">لا توجد منتجات متوفرة في هذا القسم حالياً.</p>`;
+                return;
+            }
+
+            filtered.forEach(p => {
                 const name = currentLang === 'ar' ? p.nameAr : p.nameEn;
                 grid.innerHTML += `
                     <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition duration-300 flex flex-col justify-between">
@@ -390,6 +417,7 @@
                         <div class="p-4 flex-1 flex flex-col justify-between">
                             <div>
                                 <h4 class="font-bold text-lg text-gray-800 mb-1">${name}</h4>
+                                <span class="inline-block bg-amber-50 text-bronze text-xs font-bold px-2 py-0.5 rounded border border-amber-200 mb-2">${translations[currentLang][p.category || 'other']}</span>
                                 <p class="text-bronze font-bold text-md mb-4">${p.price} EGP</p>
                             </div>
                             <button onclick="addToCart('${p.id}', this)" class="w-full bg-bronze hover:bg-dark-copper text-white py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition cursor-pointer">
@@ -433,15 +461,6 @@
             document.getElementById('cartModal').classList.add('hidden');
         }
 
-        function toggleWalletInfo() {
-            const method = document.getElementById('payMethod').value;
-            if(method === 'wallet') {
-                document.getElementById('walletInfoBox').classList.remove('hidden');
-            } else {
-                document.getElementById('walletInfoBox').classList.add('hidden');
-            }
-        }
-
         function renderCartItems() {
             const list = document.getElementById('cartItemsList');
             list.innerHTML = '';
@@ -474,6 +493,24 @@
             renderCartItems();
         }
 
+        // 🤖 إرسال الإشعار الآلي الصامت إلى الواتساب الخاص بك بالخلفية
+        function sendSilentWhatsAppAlert(order) {
+            const itemsSummary = order.items.map(i => `${i.product.nameAr} (${i.qty} قطع)`).join(' + ');
+            const message = `🛍️ طلب جديد في دُكّان!\n-------------------\n👤 العميل: ${order.customerName}\n📞 الهاتف: ${order.phone}\n📍 العنوان: ${order.address}\n📦 الطلبات: ${itemsSummary}\n💰 الإجمالي: ${order.total} EGP\n💵 طريقة الدفع: عند الاستلام`;
+            
+            // 💡 لتفعيلها مجاناً وتلقائياً بالكامل: سجل رقمك في خدمة CallMeBot السهلة وضع الـ ApiKey هنا
+            const myCallMeBotApiKey = "ضع_هنا_API_KEY_الخاص_بخدمة_callmebot"; 
+            
+            if(myCallMeBotApiKey && myCallMeBotApiKey !== "ضع_هنا_API_KEY_الخاص_بخدمة_callmebot") {
+                const targetUrl = `https://api.callmebot.com/whatsapp.php?phone=201039721545&text=${encodeURIComponent(message)}&apikey=${myCallMeBotApiKey}`;
+                fetch(targetUrl)
+                    .then(() => console.log("تم إرسال إشعار الواتساب الآلي خلف الكواليس!"))
+                    .catch(err => console.error("فشل إرسال رسالة الواتساب:", err));
+            } else {
+                console.log("الإشعار الآلي جاهز، لكن يحتاج لمفتاح الـ Api Key للعمل صامتاً:", message);
+            }
+        }
+
         function handleCheckout(e) {
             e.preventDefault();
             if(cart.length === 0) return alert('سلتك فارغة!');
@@ -482,20 +519,23 @@
                 customerName: document.getElementById('custName').value,
                 phone: document.getElementById('custPhone').value,
                 address: document.getElementById('custAddress').value,
-                payment: document.getElementById('payMethod').value,
+                payment: "cod",
                 items: cart.map(item => ({ product: { nameAr: item.product.nameAr, nameEn: item.product.nameEn, price: item.product.price, image: item.product.image }, qty: item.qty })),
                 total: cart.reduce((acc, item) => acc + (item.product.price * item.qty), 0),
                 status: 'pending',
                 date: new Date().toLocaleString()
             };
 
-            // 🚀 حفظ الطلب مباشرة في قاعدة البيانات السحابية
+            // حفظ الطلب سحابياً في الفايربيز
             database.ref('orders').push(orderData).then(() => {
+                // استدعاء ميزة إرسال رسالة الواتساب الآلية صامتاً
+                sendSilentWhatsAppAlert(orderData);
+
                 cart = [];
                 updateCartCount();
                 document.getElementById('checkoutForm').reset();
                 closeCartModal();
-                alert(currentLang === 'ar' ? 'تم تسجيل طلبك بنجاح داخل النظام السحابي لدكان!' : 'Order Placed Successfully!');
+                alert(currentLang === 'ar' ? 'تم تسجيل طلبك بنجاح وجاري تجهيزه للتوصيل!' : 'Order Placed Successfully!');
             });
         }
 
@@ -510,10 +550,11 @@
                             <div class="text-gray-800 font-bold">${p.nameAr}</div>
                             <div class="text-gray-400 text-xs">${p.nameEn}</div>
                         </td>
+                        <td class="p-3 text-xs font-semibold text-gray-500">${translations[currentLang][p.category || 'other']}</td>
                         <td class="p-3 text-bronze font-bold">${p.price} EGP</td>
                         <td class="p-3 text-center">
-                            <button onclick="editProduct('${p.id}')" class="text-blue-600 hover:text-blue-800 font-medium mx-2 cursor-pointer"><i class="fa-solid fa-pen-to-square"></i> ${translations[currentLang].edit}</button>
-                            <button onclick="deleteProduct('${p.id}')" class="text-red-600 hover:text-red-800 font-medium mx-2 cursor-pointer"><i class="fa-solid fa-trash"></i> ${translations[currentLang].delete}</button>
+                            <button onclick="editProduct('${p.id}')" class="text-blue-600 hover:text-blue-800 font-medium mx-2 cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteProduct('${p.id}')" class="text-red-600 hover:text-red-800 font-medium mx-2 cursor-pointer"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -526,15 +567,14 @@
             const nameAr = document.getElementById('prodNameAr').value;
             const nameEn = document.getElementById('prodNameEn').value;
             const price = parseFloat(document.getElementById('prodPrice').value);
+            const category = document.getElementById('prodCategory').value;
             const image = document.getElementById('prodImage').value;
 
-            const productData = { nameAr, nameEn, price, image };
+            const productData = { nameAr, nameEn, price, category, image };
 
             if(id) {
-                // تحديث سحابي
                 database.ref('products/' + id).set(productData);
             } else {
-                // إضافة سحابية جديدة
                 database.ref('products').push(productData);
             }
 
@@ -548,6 +588,7 @@
             document.getElementById('prodNameAr').value = p.nameAr;
             document.getElementById('prodNameEn').value = p.nameEn;
             document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodCategory').value = p.category || 'other';
             document.getElementById('prodImage').value = p.image;
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
@@ -586,9 +627,7 @@
                         </div>
                         <div class="text-right flex flex-col items-end justify-between min-h-[80px]">
                             <div class="text-md font-bold text-bronze">${translations[currentLang].total}: ${o.total} EGP</div>
-                            <div class="text-xs font-semibold ${o.payment === 'wallet' ? 'text-purple-600' : 'text-blue-600'}">
-                                ${translations[currentLang].payment}: ${o.payment === 'wallet' ? translations[currentLang].optWallet : translations[currentLang].optCod}
-                            </div>
+                            <div class="text-xs font-semibold text-green-600">الدفع عند الاستلام</div>
                             <div class="mt-2">
                                 <span class="px-2 py-1 rounded text-xs font-bold ${o.status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}">
                                     ${o.status === 'pending' ? translations[currentLang].pending : translations[currentLang].completed}
