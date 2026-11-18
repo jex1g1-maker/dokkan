@@ -1,4 +1,4 @@
-Dokan (دكان) 🛒
+Dokkan (دكان) 🛒
 
 Hey there! Welcome to Dokan—a simple, lightweight online store project I built to sell products online without the headache of setting up a massive backend or complex build tools.
 
