@@ -1,6 +1,6 @@
 Dokkan (دكان) 🛒
 
-Hey there! Welcome to Dokan—a simple, lightweight online store project I built to sell products online without the headache of setting up a massive backend or complex build tools.
+Hey there! Welcome to Dokkan—a simple, lightweight online store project I built to sell products online without the headache of setting up a massive backend or complex build tools.
 
 The coolest thing about this project? Everything lives inside a single HTML file. Yep, HTML, CSS, JavaScript, and Firebase are all bundled together in one place. No complicated folder structures, just drop it in and watch it work!
 
